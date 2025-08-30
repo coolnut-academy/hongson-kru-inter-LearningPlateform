@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hongson Kru Inter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f0fdf4;
+        }
+        .neon-text {
+            text-shadow: 0 0 5px #a7f3d0, 0 0 10px #a7f3d0, 0 0 15px #34d399, 0 0 20px #34d399;
+        }
+        .title-gradient {
+            background: -webkit-linear-gradient(45deg, #047857, #2dd4bf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .module-button {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .module-button.locked {
+            background-color: #e5e7eb;
+            cursor: not-allowed;
+            color: #9ca3af;
+        }
+         .module-button.locked .emoji-icon {
+            filter: grayscale(100%);
+        }
+        .module-button.completed {
+            background-color: #d1fae5;
+            border-color: #10b981;
+        }
+        .module-button:not(.locked):hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .quiz-option {
+            transition: background-color 0.2s;
+        }
+        .quiz-option.correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46;
+        }
+        .quiz-option.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b;
+        }
+        .quiz-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        #modal-body::-webkit-scrollbar, #certificate-modal-body::-webkit-scrollbar, #stats-container::-webkit-scrollbar { width: 8px; }
+        #modal-body::-webkit-scrollbar-track, #certificate-modal-body::-webkit-scrollbar-track, #stats-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        #modal-body::-webkit-scrollbar-thumb, #certificate-modal-body::-webkit-scrollbar-thumb, #stats-container::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+        #modal-body::-webkit-scrollbar-thumb:hover, #certificate-modal-body::-webkit-scrollbar-thumb:hover, #stats-container::-webkit-scrollbar-thumb:hover { background: #555; }
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .nav-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: scale(1);
+            box-shadow: none;
+        }
+
+        /* --- Statistics Page --- */
+        .main-content { transition: opacity 0.3s ease; }
+        #statistics-page { 
+            background: linear-gradient(135deg, #065f46, #0d9488, #14b8a6);
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .stats-card {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-green-50 text-gray-800">
+    <!-- Main Learning Content -->
+    <div id="main-content" class="main-content min-h-screen w-full flex flex-col items-center p-4 relative bg-cover bg-center" style="background-image: url('https://www.transparenttextures.com/patterns/leafy-green.png');">
+        <div class="absolute inset-0 bg-emerald-50/80"></div>
+        <header class="relative z-10 w-full max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center p-4 mb-6 md:mb-8 gap-4">
+             <div class="text-center md:text-left flex items-center justify-center md:justify-start">
+                <img src="https://img2.pic.in.th/pic/logo-hongson.png" alt="Logo" class="w-16 h-16 mr-4">
+                <h1 class="text-4xl md:text-5xl font-bold title-gradient drop-shadow-md">Hongson Kru Inter</h1>
+            </div>
+            <div id="score-container" class="bg-white/80 backdrop-blur-sm border-2 border-emerald-400 rounded-xl shadow-lg p-3 text-center flex-shrink-0">
+                <span class="text-lg font-semibold text-emerald-700">คะแนนรวม</span>
+                <p id="total-score" class="text-3xl font-bold text-emerald-500 neon-text">0</p>
+            </div>
+        </header>
+        <main id="learning-path" class="relative z-10 w-full max-w-2xl flex-grow flex flex-col items-center pb-8">
+            <div class="w-full bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md mb-8 text-center">
+                <h2 class="text-xl font-semibold text-emerald-700 mb-2">ยินดีต้อนรับ!</h2>
+                <p class="text-gray-600 text-sm">หลักสูตร "ภาษาอังกฤษและภาษาจีนในชีวิตประจำวันสำหรับครู" พร้อมแล้ว! มาเริ่มเรียนรู้และฝึกฝนประโยคสำคัญที่ใช้บ่อยในโรงเรียนกันเถอะ</p>
+            </div>
+            <div id="modules-container" class="w-full space-y-4"></div>
+            
+            <button id="complete-course-btn" class="hidden mt-8 nav-button px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xl font-bold rounded-xl shadow-lg hover:shadow-2xl">
+                🏆 สำเร็จแล้ว (Completed) 🏆
+            </button>
+            <button id="show-stats-btn" class="mt-4 nav-button px-6 py-2 bg-white border-2 border-emerald-300 text-emerald-700 font-semibold rounded-lg shadow-sm">
+                📊 สถิติผู้ผ่านการอบรม
+            </button>
+        </main>
+        <footer class="relative z-10 w-full max-w-6xl mx-auto text-center text-xs text-gray-600 mt-auto p-4">
+            <p>&copy; 2024 โรงเรียนห้องสอนศึกษา ในพระอุปถัมภ์ฯ. สงวนลิขสิทธิ์</p>
+            <p>เนื้อหาการอบรมโดย คุณครูกลุ่มสาระการเรียนรู้ต่างประเทศ</p>
+            <p>พัฒนาเว็บไซต์โดย: นายสาธิต ศิริวัชน์</p>
+        </footer>
+    </div>
+    
+    <!-- Statistics Page -->
+    <div id="statistics-page" class="fixed inset-0 z-50 p-4 sm:p-6 md:p-8 flex flex-col opacity-0 invisible">
+        <header class="flex-shrink-0 flex justify-between items-center mb-6">
+            <h2 class="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg">🏆 สถิติผู้ผ่านการอบรม 🏆</h2>
+            <button id="back-to-home-btn" class="nav-button px-5 py-2 bg-white/20 backdrop-blur-sm text-white rounded-lg font-semibold shadow-md">⬅️ กลับหน้าหลัก</button>
+        </header>
+        <div id="stats-container" class="flex-grow overflow-y-auto space-y-3 pr-2">
+            <!-- Stats cards will be injected here -->
+        </div>
+        <div id="stats-loading" class="text-white text-center text-xl mt-10">กำลังโหลดข้อมูล...</div>
+        <footer class="flex-shrink-0 text-center text-white/70 text-xs mt-4">
+            ข้อมูลอัปเดตอัตโนมัติทุก 1 นาที
+        </footer>
+    </div>
+
+
+    <!-- Module Modal -->
+    <div id="module-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center opacity-0 invisible transition-opacity duration-300 z-50 p-4">
+        <div id="modal-content-box" class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform scale-95 transition-transform duration-300 overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="flex-shrink-0">
+                <img id="modal-image" src="https://placehold.co/600x300/a7f3d0/10b981?text=Hongson+Kru+Inter" alt="ภาพประกอบโมดูล" class="w-full h-40 md:h-48 object-cover">
+                <div class="p-6 pb-4">
+                    <h2 id="modal-title" class="text-2xl font-bold text-emerald-700"></h2>
+                </div>
+            </div>
+
+            <div id="modal-body" class="p-6 pt-0 flex-grow overflow-y-auto">
+                 <div id="page-1" class="page active"></div>
+                 <div id="page-2" class="page"></div>
+                 <div id="page-3" class="page"></div>
+            </div>
+
+            <div id="modal-footer" class="p-4 bg-gray-50 border-t flex-shrink-0 flex justify-between items-center">
+                 <button id="nav-btn-home" class="nav-button px-4 py-2 bg-white border-2 border-emerald-200 rounded-full text-xl shadow-sm" title="กลับหน้าหลัก">🏠</button>
+                 <div class="space-x-2 flex">
+                    <button id="nav-btn-prev" class="nav-button px-5 py-2 bg-white border-2 border-emerald-200 rounded-lg font-semibold text-emerald-700 shadow-sm">⬅️ ก่อนหน้า</button>
+                    <button id="nav-btn-next" class="nav-button px-5 py-2 bg-emerald-500 border-2 border-emerald-500 text-white rounded-lg font-semibold shadow-sm">ถัดไป ➡️</button>
+                 </div>
+                 <button id="complete-module-btn" class="hidden nav-button px-5 py-2 bg-emerald-500 text-white rounded-lg font-semibold shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed">เรียนจบแล้ว</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Certificate Modal -->
+    <div id="certificate-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center opacity-0 invisible transition-opacity duration-300 z-50 p-4">
+        <div id="certificate-modal-box" class="bg-white rounded-2xl shadow-2xl w-full max-w-lg transform scale-95 transition-transform duration-300 overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-6 text-center bg-emerald-500 text-white">
+                <h2 class="text-3xl font-bold">ขอแสดงความยินดี!</h2>
+                <p>Congratulations! | 恭喜!</p>
+            </div>
+            <div id="certificate-modal-body" class="p-6 flex-grow overflow-y-auto space-y-4">
+                <p class="text-center text-gray-600">คุณได้สำเร็จหลักสูตรแล้ว! กรุณากรอกข้อมูลด้านล่างเพื่อรับเกียรติบัตร</p>
+                <div>
+                    <label for="first-name" class="block text-sm font-medium text-gray-700">ชื่อ (First Name - English)</label>
+                    <input type="text" id="first-name" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+                 <div>
+                    <label for="last-name" class="block text-sm font-medium text-gray-700">นามสกุล (Last Name - English)</label>
+                    <input type="text" id="last-name" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-emerald-500 focus:border-emerald-500">
+                </div>
+                <div id="g-sheet-feedback" class="text-center"></div>
+            </div>
+            <div class="p-4 bg-gray-50 border-t flex-shrink-0 flex justify-end space-x-2">
+                 <button id="close-cert-modal-btn" class="nav-button px-5 py-2 bg-gray-200 text-gray-800 rounded-lg font-semibold">ปิด</button>
+                 <button id="get-certificate-btn" class="nav-button px-5 py-2 bg-emerald-500 text-white rounded-lg font-semibold shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed" disabled>รับเกียรติบัตร</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DATA ---
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzFxTZs800l5C182cRVXzvrcEiWeRik5ltp7nadKh_kfnMdr1YmiGMPtOJMJAH1XyvetA/exec';
+        const initialModulesState = [
+            { 
+                id: 1, title: 'การทักทาย ถามไถ่ และอำลา', score: 20, emoji: '👋', 
+                imageUrl: 'https://placehold.co/600x300/d1fae5/065f46?text=Module+1',
+                soundcloudIframe: `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2159606790&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/satit-siriwach" title="Satit Siriwach" target="_blank" style="color: #cccccc; text-decoration: none;">Satit Siriwach</a> · <a href="https://soundcloud.com/satit-siriwach/1a" title="โมดูลที่ 1 - การทักทาย ถามไถ่ และอำลา" target="_blank" style="color: #cccccc; text-decoration: none;">โมดูลที่ 1 - การทักทาย ถามไถ่ และอำลา</a></div>`,
+                completed: false, locked: false,
+                content: {
+                    page1: {
+                        title: 'เนื้อหาบทเรียน',
+                        type: 'phrases',
+                        data: [
+                            { th: 'สวัสดีตอนเช้า', en: "Good morning (กุด มอร์-หนึ่ง)", ch: "早上好 (zǎo shàng hǎo / จ่าว ช่าง ห่าว)" },
+                            { th: 'สวัสดีตอนบ่าย', en: "Good afternoon (กิด อ๊าฟ-เท่อะ-นูน)", ch: "下午好 (xià wǔ hǎo / เซี่ย อู่ ห่าว)" },
+                            { th: 'สวัสดีตอนเย็น', en: "Good evening (กุด อีฟ-หนึ่ง)", ch: "晚上好 (wǎn shàng hǎo / หว่าน ช่าง ห่าว)" },
+                            { th: 'สบายดีไหม', en: "How are you? (ฮาว อาร์ ยู)", ch: "你好吗? (nǐ hǎo ma / หนี ห่าว มะ)" },
+                            { th: 'ไม่เจอกันนานเลยนะ', en: "Long time no see (ลอง ไทม์ โน ซี)", ch: "好久不见 (hǎojiǔ bùjiàn / หาวจิ๋ว ปู่เจี้ยน)" },
+                            { th: 'ลาก่อน', en: "Goodbye (กุด-บาย)", ch: "再见 (zài jiàn / ไจ้ เจี้ยน)" },
+                            { th: 'ดูแลตัวเองด้วยนะ', en: "Take care (เทค แคร์)", ch: "保重 (bǎozhòng / เป่าจ้ง)" },
+                        ]
+                    },
+                    page2: {
+                        title: 'สถานการณ์ตัวอย่าง',
+                        type: 'scenario',
+                        data: {
+                            context: 'ครู A เจอครู B ที่ไม่ได้เจอกันมาพักใหญ่',
+                            dialogue: [
+                                { speaker: 'ครู A', th: "ครูบี! ไม่เจอกันนานเลยนะคะ เป็นอย่างไรบ้าง", en: "Teacher B! Long time no see. How have you been? (ทีชเชอร์ บี! ลอง ไทม์ โน ซี. ฮาว แฮฟ ยู บีน?)", ch: "B老师! 好久不见。最近怎么样? (B lǎoshī! Hǎojiǔ bùjiàn. Zuìjìn zěnme yàng? / บี เหล่าซือ! หาวจิ๋ว ปู่เจี้ยน. จุ้ยจิ้น เจิ่นเมอะย่าง?)" },
+                                { speaker: 'ครู B', th: "โอ้ ครูเอ! สบายดีค่ะ ก็ไม่แย่นะคะ แล้วคุณล่ะ", en: "Oh, Teacher A! I'm doing well. Not too bad. And you? (โอ, ทีชเชอร์ เอ! แอม ดูอิ้ง เวล. น็อท ทู แบด. แอนด์ ยู?)", ch: "啊, A老师! 我很好, 还不错。你呢? (Ā, A lǎoshī! Wǒ hěn hǎo, hái bùcuò. Nǐ ne? / อา, เอ เหล่าซือ! หว่อ เหิน ห่าว, ไห ปู้ชั่ว. หนี่ เนอะ?)" },
+                                { speaker: 'ครู A', th: "เหมือนกันเลยค่ะ ต้องไปก่อนแล้วนะคะ ดูแลตัวเองด้วย", en: "Same here. I have to go now. Take care. (เซม เฮียร์. ไอ แฮฟ ทู โก นาว. เทค แคร์.)", ch: "我也一样。我得先走了, 保重。(Wǒ yě yīyàng. Wǒ dé xiān zǒule, bǎozhòng. / หว่อ เหย่ อี๋ย่าง. หว่อ เต๋ย เซียน โจ่วเลอ, เป่าจ้ง.)" },
+                            ]
+                        }
+                    },
+                    page3: {
+                        title: 'แบบฝึกหัด',
+                        type: 'quiz',
+                        data: [
+                            { q: "A: How are you? (ฮาว อาร์ ยู) <br>B: I'm _____, thank you. (แอม _____, แธงค์-กิ่ว)", a: ['name (เนม)', 'fine (ไฟน์)', 'later (เล-เทอร์)', 'morning (มอร์-นิง)'], correct: 1 },
+                            { q: "ถ้าคุณเจอเพื่อนร่วมงานที่ไม่ได้เจอมาเป็นเดือน ควรเริ่มต้นทักทายอย่างไรจึงจะเหมาะสมที่สุด", a: ['Good morning (กุด มอร์-หนึ่ง)', 'How are you? (ฮาว อาร์ ยู)', 'Long time no see (ลอง ไทม์ โน ซี)', 'Take care (เทค แคร์)'], correct: 2 },
+                            { q: "เพื่อนของคุณกำลังจะเดินทางไกล คุณควรกล่าวลาว่าอย่างไรเพื่อแสดงความห่วงใย", a: ['你好吗? (nǐ hǎo ma / หนี ห่าว มะ)', '保重 (bǎozhòng / เป่าจ้ง)', '还不错 (hái bùcuò / ไห ปู่ชั่ว)', '再见 (zài jiàn / ไจ้ เจี้ยน)'], correct: 1 },
+                            { q: 'ประโยค "好久不见 (hǎojiǔ bùjiàn / หาวจิ๋ว ปู่เจี้ยน)" เหมาะกับสถานการณ์ใดมากที่สุด', a: ['กล่าวลาก่อนไปเที่ยว', 'ทักทายคนที่ไม่เคยเจอกันมาก่อน', 'ทักทายเพื่อนเก่าที่เพิ่งกลับมา', 'ตอบรับคำขอบคุณ'], correct: 2 },
+                            { q: 'ถ้าคุณเจอเพื่อนตอนเย็น ควรทักทายว่าอย่างไร', a: ['Good morning (กุด มอร์-หนึ่ง)', 'Good afternoon (กิด อ๊าฟ-เท่อะ-นูน)', 'Good evening (กุด อีฟ-หนึ่ง)', 'Goodbye (กุด-บาย)'], correct: 2 },
+                        ]
+                    }
+                }
+            },
+            { 
+                id: 2, title: 'การแนะนำตนเอง', score: 20, emoji: '🤝', 
+                imageUrl: 'https://placehold.co/600x300/a7f3d0/065f46?text=Module+2', 
+                soundcloudIframe: `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2159608119&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/satit-siriwach" title="Satit Siriwach" target="_blank" style="color: #cccccc; text-decoration: none;">Satit Siriwach</a> · <a href="https://soundcloud.com/satit-siriwach/2a" title="โมดูลที่ 2 - การแนะนำตนเอง" target="_blank" style="color: #cccccc; text-decoration: none;">โมดูลที่ 2 - การแนะนำตนเอง</a></div>`,
+                completed: false, locked: true,
+                content: {
+                    page1: {
+                        title: 'เนื้อหาบทเรียน',
+                        type: 'phrases',
+                        data: [
+                            { th: 'ผม/ฉันชื่อ...', en: "My name is... (มาย เนม อีส...)", ch: "我叫... (wǒ jiào... / หว่อ เจี้ยว...)" },
+                            { th: 'คุณชื่ออะไร', en: "What is your name? (ว็อท อีส ยัวร์ เนม)", ch: "你叫什么名字? (nǐ jiào shénme míngzi? / หนี่ เจี้ยว เฉินเมอะ หมิงจึ)" },
+                            { th: 'ยินดีที่ได้รู้จัก', en: "Nice to meet you. (ไนซ์ ทู มีท ยู)", ch: "很高兴认识你 (hěn gāoxìng rènshi nǐ / เหิ่น เกาซิ่ง เริ่นชือ หนี่)" },
+                            { th: 'ขออนุญาตแนะนำตัวเอง (ทางการ)', en: "Allow me to introduce myself (อะลาว มี ทู อินโทรดิวซ์ มายเซลฟ์)", ch: "请允许我自我介绍一下 (qǐng yǔnxǔ wǒ zìwǒ jièshào yīxià / ฉิ่ง หยวิ่นสวี่ หว่อ จื้อหว่อ เจี้ยเช่า อี๋เซี่ย)" },
+                            { th: 'รู้สึกเป็นเกียรติที่ได้พบคุณ (ทางการ)', en: "It's a pleasure to meet you (อิทส์ อะ เพลเชอร์ ทู มีท ยู)", ch: "很荣幸见到你 (hěn róngxing jiàn dào nǐ / เหิ่น หรงซิ่ง เจี้ยน เต้า หนี่)" },
+                        ]
+                    },
+                    page2: {
+                        title: 'สถานการณ์ตัวอย่าง',
+                        type: 'scenario',
+                        data: {
+                            context: 'ครูสมชาย (A) แนะนำครูเดวิด (B) ให้รู้จักกับท่านผู้อำวยการ (C)',
+                            dialogue: [
+                                { speaker: 'ครูสมชาย (A)', th: "สวัสดีตอนเช้าครับท่านผอ. ผมขออนุญาตแนะนำครูภาษาอังกฤษคนใหม่ของเรา นี่คือเดวิดครับ", en: "Good morning, Director. Allow me to introduce our new English teacher. This is David. (กุด มอร์นิ่ง, ไดเรคเตอร์. อะลาว มี ทู อินโทรดิวซ์ อาวเวอร์ นิว อิงลิช ทีชเชอร์. ดิส อิส เดวิด.)", ch: "校长, 早上好。请允许我介绍一下我们的新英语老师, 这位是大卫。(Xiàozhǎng, zǎoshang hǎo. Qǐng yǔnxǔ wǒ jièshào yīxià wǒmen de xīn yīngyǔ lǎoshī, zhè wèi shì dà wèi. / เซี่ยวจ่าง, จ่าวช่าง ห่าว. ฉิ่ง หยวิ่นสวี่ หว่อ เจี้ยเช่า อี๋เซี่ย หว่อเมิน เตอะ ซิน อิงอยู่ เหล่าซือ, เจ้อ เว่ย ซื่อ ต้าเว่ย.)" },
+                                { speaker: 'ผู้อำนวยการ (C)', th: "ยินดีที่ได้รู้จักค่ะเดวิด ยินดีต้อนรับสู่โรงเรียนของเรานะคะ", en: "It's a pleasure to meet you, David. Welcome to our school. (อิทส์ อะ เพลเชอร์ ทู มีท ยู, เดวิด. เวลคัม ทู อาวเวอร์ สคูล.)", ch: "很荣幸见到你, 大卫。欢迎你来我们学校。(Hěn róngxìng jiàn dào nǐ, dà wèi. Huānyíng nǐ lái wǒmen xuéxiào. / เหิ่น หรงซิ่ง เจี้ยน เต้า หนี่, ต้าเว่ย. ฮวนอิ๋ง หนี่ ไหล หว่อเมิน เสวียเสี้ยว.)" },
+                            ]
+                        }
+                    },
+                    page3: {
+                        title: 'แบบฝึกหัด',
+                        type: 'quiz',
+                        data: [
+                            { q: "ถ้าต้องการถามชื่อเพื่อนใหม่แบบเป็นกันเอง ควรพูดว่าอย่างไร", a: ["Allow me to introduce myself (อะลาว มี ทู อินโทรดิวซ์ มายเซลฟ์)", "What is your name? (ว็อท อีส ยัวร์ เนม)", "It's a pleasure to meet you (อิทส์ อะ เพลเชอร์ ทู มีท ยู)", "My name is... (มาย เนม อีส...)"], correct: 1 },
+                            { q: "ในสถานการณ์ที่เป็นทางการ เช่น การประชุม คุณควรเริ่มต้นแนะนำตัวเองว่าอย่างไร", a: ["What is your name? (ว็อท อีส ยัวร์ เนม)", "I am... (ไอ แอม...)", "Allow me to introduce myself (อะลาว มี ทู อินโทรดิวซ์ มายเซลฟ์)", "Nice to meet you (ไนซ์ ทู มีท ยู)"], correct: 2 },
+                            { q: 'ประโยค "很高兴认识你 (hěn gāoxìng rènshi nǐ / เหิ่น เกาซิ่ง เริ่นชือ หนี่)" มีความหมายว่าอะไร', a: ["คุณชื่ออะไร", "ยินดีที่ได้รู้จัก", "รู้สึกเป็นเกียรติ", "สบายดีไหม"], correct: 1 },
+                            { q: "คุณต้องการแนะนำเพื่อนสองคนที่ไม่เคยเจอกันมาก่อน คุณควรเริ่มต้นบทสนทนาว่าอย่างไร", a: ["Have you two met before? (แฮฟ ยู ทู เม็ท บีฟอร์)", "What are your names? (ว็อท อาร์ ยัวร์ เนมส์)", "It's a pleasure to meet you (อิทส์ อะ เพลเชอร์ ทู มีท ยู)", "My name is... (มาย เนม อีส...)"], correct: 0 },
+                            { q: "ประโยคใดที่เหมาะจะใช้พูดกับผู้อำนวยการโรงเรียนเมื่อพบกันครั้งแรก", a: ["What is your name? (ว็อท อีส ยัวร์ เนม)", "It's a pleasure to meet you (อิทส์ อะ เพลเชอร์ ทู มีท ยู)", "Have you two met before? (แฮฟ ยู ทู เม็ท บีฟอร์)", "Nice to meet you (ไนซ์ ทู มีท ยู)"], correct: 1 },
+                        ]
+                    }
+                }
+            },
+            {
+                id: 3, title: 'ประโยคคำสั่งในห้องเรียน', score: 20, emoji: '🧑‍🏫', 
+                imageUrl: 'https://placehold.co/600x300/6ee7b7/065f46?text=Module+3', 
+                soundcloudIframe: `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2159609205&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/satit-siriwach" title="Satit Siriwach" target="_blank" style="color: #cccccc; text-decoration: none;">Satit Siriwach</a> · <a href="https://soundcloud.com/satit-siriwach/3a" title="โมดูลที่ 3 - ประโยคคำสั่งในห้องเรียน" target="_blank" style="color: #cccccc; text-decoration: none;">โมดูลที่ 3 - ประโยคคำสั่งในห้องเรียน</a></div>`,
+                completed: false, locked: true,
+                content: {
+                    page1: {
+                        title: 'เนื้อหาบทเรียน',
+                        type: 'phrases',
+                        data: [
+                            { th: 'เปิดหนังสือ', en: "Open your book (โอ-เพิ่น ยัวร์ บุ๊ค)", ch: "打开书 (dǎ kāi shū / ต่า คาย ชู)" },
+                            { th: 'นั่งลง', en: "Sit down (ซิท ดาวน์)", ch: "请坐 (qǐng zuò / ฉิ่ง จั่ว)" },
+                            { th: 'เงียบๆ หน่อย', en: "Be quiet, please (บี ไคว-เอ็ท, พลีส)", ch: "请安静 (qǐng ānjìng / ฉิ่ง อัน จิ้ง)" },
+                            { th: 'กรุณาตั้งใจฟัง', en: "Please pay attention (พลีส เพย์ แอทเทนชั่น)", ch: "请注意听 (qǐng zhùyì tīng / ฉิ่ง จู้ยี่ ทิง)" },
+                            { th: 'ทำงานเป็นคู่', en: "Work in pairs (เวิร์ค อิน แพร์ส)", ch: "两人一组 (liǎng rén yī zǔ / เหลียง เหิน อี จู่)" },
+                            { th: 'มีใครอาสาไหม', en: "Any volunteers? (เอ็น-นี่ วอลันเทียร์ส)", ch: "有谁自愿吗? (yǒu shéi zìyuàn ma? / โหย่ว เฉย จื้อย่วน มะ?)" },
+                        ]
+                    },
+                    page2: {
+                        title: 'สถานการณ์ตัวอย่าง',
+                        type: 'scenario',
+                        data: {
+                            context: 'ครูกำลังจะเริ่มกิจกรรมในห้องเรียน',
+                            dialogue: [
+                                { speaker: 'ครู', th: "โอเคค่ะทุกคน กรุณาตั้งใจฟัง สำหรับกิจกรรมนี้ ครูอยากให้ทุกคนทำงานเป็นคู่นะคะ", en: "Okay everyone, please pay attention. For this activity, I want you to work in pairs. (โอเค เอฟรี่วัน, พลีส เพย์ แอทเทนชั่น. ฟอร์ ดิส แอคทิวิตี้, ไอ ว้อนท์ ยู ทู เวิร์ค อิน แพร์ส.)", ch: "好的各位, 请注意听。这个活动, 我想让大家两人一组。(Hǎo de gèwèi, qǐng zhùyì tīng. Zhège huódòng, wǒ xiǎng ràng dàjiā liǎng rén yī zǔ. / ห่าว เตอะ เก้อเว่ย, ฉิ่ง จู้ยี่ ทิง. เจ้อเก้อ หัวต้ง, หว่อ เสี่ยง ร่าง ต้าเจีย เหลียง เหิน อี จู่.)" },
+                            ]
+                        }
+                    },
+                    page3: {
+                        title: 'แบบฝึกหัด',
+                        type: 'quiz',
+                        data: [
+                           { q: "ถ้าต้องการให้นักเรียนเงียบ ควรพูดว่าอย่างไร", a: ["Sit down, please (ซิท ดาวน์, พลีส)", "Be quiet, please (บี ไคว-เอ็ท, พลีส)", "Open your book, please (โอ-เพิ่น ยัวร์ บุ๊ค, พลีส)", "Any volunteers? (เอ็น-นี่ วอลันเทียร์ส)"], correct: 1 },
+                           { q: "เมื่อนักเรียนเริ่มคุยกันในขณะที่คุณกำลังสอน คุณควรพูดว่าอย่างไรเพื่อดึงความสนใจกลับมา", a: ["Work in pairs (เวิร์ค อิน แพร์ส)", "Any volunteers? (เอ็น-นี่ วอลันเทียร์ส)", "Please pay attention (พลีส เพย์ แอทเทนชั่น)", "Sit down (ซิท ดาวน์)"], correct: 2 },
+                           { q: 'ครูพูดว่า "两人一组 (liǎng rén yī zǔ / เหลียง เหริน อี จู่)" หมายความว่าครูต้องการให้นักเรียนทำอะไร', a: ["ทำงานคนเดียว", "ทำงานเป็นคู่", "ทำงานเป็นกลุ่มสามคน", "อาสาสมัคร"], correct: 1 },
+                           { q: "หลังจากสอนจบ และต้องการหาคนมาตอบคำถามหน้าชั้นเรียน ครูควรถามว่าอย่างไร", a: ["Any volunteers? (เอ็น-นี่ วอลันเทียร์ส)", "Let's move on (เลทส์ มูฟ ออน)", "Please pay attention (พลีส เพย์ แอทเทนชั่น)", "Work in pairs (เวิร์ค อิน แพร์ส)"], correct: 0 },
+                           { q: "ถ้าครูต้องการให้นักเรียนเปิดหนังสือเรียน ควรพูดว่าอย่างไร", a: ["Sit down (ซิท ดาวน์)", "Open your book (โอ-เพิ่น ยัวร์ บุ๊ค)", "Any volunteers? (เอ็น-นี่ วอลันเทียร์ส)", "Be quiet (บี ไคว-เอ็ท)"], correct: 1 },
+                        ]
+                    }
+                }
+            },
+            { 
+                id: 4, title: 'การให้กำลังใจและคำชม', score: 20, emoji: '✨', 
+                imageUrl: 'https://placehold.co/600x300/34d399/065f46?text=Module+4', 
+                soundcloudIframe: `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2159610198&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/satit-siriwach" title="Satit Siriwach" target="_blank" style="color: #cccccc; text-decoration: none;">Satit Siriwach</a> · <a href="https://soundcloud.com/satit-siriwach/4a" title="โมดูลที่ 4 - การให้กำลังใจและคำชม" target="_blank" style="color: #cccccc; text-decoration: none;">โมดูลที่ 4 - การให้กำลังใจและคำชม</a></div>`,
+                completed: false, locked: true,
+                content: {
+                    page1: {
+                        title: 'เนื้อหาบทเรียน',
+                        type: 'phrases',
+                        data: [
+                            { th: 'ดีมาก', en: "Very good (เว-รี่ กู้ด)", ch: "很好 (hěn hǎo / เหิ่น ห่าว)" },
+                            { th: 'เก่งมาก / ยอดเยี่ยม', en: "Excellent (เอ็ก-เซล-เลนท์) / Well done (เวล ดัน)", ch: "很棒 (hěn bàng / เหิ่น ปั้ง)" },
+                            { th: 'นั่นเป็นการพัฒนาที่ยอดเยี่ยม', en: "That's a great improvement (แดทส์ อะ เกรท อิมพรูฟเมนท์)", ch: "这是一个很大的进步 (zhè shì yīgè hěn dà de jìnbù / เจ้อ ซื่อ อี๋เก้อ เหิ่น ต้า เตอะ จิ้นปู้)" },
+                            { th: 'พยายามต่อไป', en: "Keep trying (คีพ ทราย-อิ้ง)", ch: "继续努力 (jìxù nǔlì / จี้ ชวี่ หนู่ ลี่)" },
+                            { th: 'อย่าเพิ่งยอมแพ้', en: "Don't give up (โด้นท์ กิฟ อัพ)", ch: "别放弃 (bié fàngqì / เปี๋ย ฟั่งชี่)" },
+                        ]
+                    },
+                    page2: {
+                        title: 'สถานการณ์ตัวอย่าง',
+                        type: 'scenario',
+                        data: {
+                            context: 'นักเรียนกำลังพยายามแก้โจทย์คณิตศาสตร์ที่ยาก',
+                            dialogue: [
+                                { speaker: 'นักเรียน', th: 'ครูครับ ผมทำไม่ได้เลย' },
+                                { speaker: 'ครู', th: "อย่าเพิ่งยอมแพ้นะ ใกล้จะสำเร็จแล้ว เธอเริ่มจับทางได้แล้ว", en: "Don't give up, you're almost there. You've got the hang of it. (โด้นท์ กิฟ อัพ, ยัวร์ ออลโมสท์ แดร์. ยูฟ ก็อท เดอะ แฮง ออฟ อิท.)", ch: "别放弃, 你就快成功了。你已经掌握窍门了。(Bié fàngqì, nǐ jiù kuài chénggōngle. Nǐ yǐjīng zhǎngwò qiàoménle. / เปี๋ย ฟั่งชี่, หนี่ จิ้ว ไคว่ เฉิงกงเลอ. หนี่ อี่จิง จ่างว่อ เชี่ยวเหมินเลอ.)" },
+                                { speaker: 'นักเรียน', th: 'จริงเหรอครับ' },
+                                { speaker: 'ครู', th: "ใช่แล้ว พยายามต่อไปนะ!", en: "Yes, keep trying! (เยส, คีพ ทราย-อิ้ง!)", ch: "是的, 继续努力! (Shì de, jìxù nǔlì! / ซื่อ เตอะ, จี้ ชวี่ หนู่ ลี่!)" },
+                            ]
+                        }
+                    },
+                    page3: {
+                        title: 'แบบฝึกหัด',
+                        type: 'quiz',
+                        data: [
+                            { q: "เมื่อนักเรียนทำงานได้ดีขึ้นกว่าครั้งก่อนมาก ควรชมว่าอย่างไร", a: ["Keep trying (คีพ ทราย-อิ้ง)", "Excellent! (เอ็ก-เซล-เลนท์)", "That's a great improvement (แดทส์ อะ เกรท อิมพรูฟเมนท์)", "You can do it (ยู แคน ดู อิท)"], correct: 2 },
+                            { q: "นักเรียนกำลังท้อแท้เพราะแก้ปัญหาไม่ได้ ควรให้กำลังใจว่าอย่างไร", a: ["Very good (เว-รี่ กู้ด)", "You've got the hang of it (ยูฟ ก็อท เดอะ แฮง ออฟ อิท)", "Don't give up, you're almost there (โด้นท์ กิฟ อัพ, ยัวร์ ออลโมสท์ แดร์)", "That's a great improvement (แดทส์ อะ เกรท อิมพรูฟเมนท์)"], correct: 2 },
+                            { q: 'ประโยค “你已经掌握窍门了 (nǐ yǐjīng zhǎngwò qiàoménle / หนี่ อี่จิง จ่างว่อ เชี่ยวเหมินเลอ)” มีความหมายว่าอะไร', a: ["พยายามต่อไปนะ", "เธอทำได้แน่นอน", "เธอเริ่มจับทางได้แล้ว", "เป็นการพัฒนาที่ดีมาก"], correct: 2 },
+                            { q: "A: I can't solve this problem (ไอ ค้านท์ โซลฟ์ ดิส พร็อบเบล็ม).<br>B: _____, you're almost there (_____, ยัวร์ ออลโมสท์ แดร์).", a: ["Very good (เว-รี่ กู้ด)", "Excellent (เอ็ก-เซล-เลนท์)", "Don't give up (โด้นท์ กิฟ อัพ)", "Thank you (แธงค์-กิ่ว)"], correct: 2 },
+                            { q: '"Keep trying (คีพ ทราย-อิ้ง)" มีความหมายตรงกับข้อใดในภาษาจีน', a: ["很好 (hěn hǎo / เหิ่น ห่าว)", "很棒 (hěn bàng / เหิ่น ปั้ง)", "继续努力 (jìxù nǔlì / จี้ ชวี่ หนู่ ลี่)", "你可以的 (nǐ kěyǐ de / หนี่ เขอ อี่ เตอะ)"], correct: 2 },
+                        ]
+                    }
+                }
+            },
+            {
+                id: 5, title: 'การสอบถามและแจ้งข้อมูลนักเรียน', score: 20, emoji: '❓', 
+                imageUrl: 'https://placehold.co/600x300/10b981/f0fdf4?text=Module+5', 
+                soundcloudIframe: `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2159611386&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/satit-siriwach" title="Satit Siriwach" target="_blank" style="color: #cccccc; text-decoration: none;">Satit Siriwach</a> · <a href="https://soundcloud.com/satit-siriwach/5a" title="โมดูลที่ 5 - การสอบถามและแจ้งข้อมูลนักเรียน" target="_blank" style="color: #cccccc; text-decoration: none;">โมดูลที่ 5 - การสอบถามและแจ้งข้อมูลนักเรียน</a></div>`,
+                completed: false, locked: true,
+                content: {
+                     page1: {
+                        title: 'เนื้อหาบทเรียน',
+                        type: 'phrases',
+                        data: [
+                            { th: 'เข้าใจไหม', en: "Do you understand? (ดู ยู อัน-เดอร์-สแตนด์)", ch: "懂了吗? (dǒng le ma / ต่ง เลอ มะ)" },
+                            { th: 'ที่ครูอธิบายไปพอจะเข้าใจไหม', en: "Does that make sense? (ดาส แดท เมค เซนส์)", ch: "这样说有道理吗? (zhèyàng shuō yǒu dàolǐ ma? / เจ้อย่าง ชัว โหย่ว เต้าหลี่ มะ)" },
+                            { th: 'ทุกคนตามทันใช่ไหม', en: "Is everyone on the same page? (อีส เอฟรีวัน ออน เดอะ เซม เพจ)", ch: "大家都跟上了吗? (dàjiā dōu gēn shàng le ma? / ต้าเจีย โตว เกิน ช่าง เลอ มะ)" },
+                            { th: 'มีคำถามไหม', en: "Any questions? (เอ็น-นี่ เควส-ชั่นส์)", ch: "有问题吗? (yǒu wèntí ma / โหย่ว เวิ่น ถี มะ)" },
+                            { th: 'ช่วยพูดอีกครั้งได้ไหม', en: "Could you say that again, please? (คูด ยู เซย์ แดท อะเกน, พลีส)", ch: "可以请您再说一遍吗? (kěyǐ qǐng nín zàishuō yībiàn ma? / เขออี่ ฉิ่ง หนิน ไจ้ชัว อี๋เปี้ยน มะ)" },
+                            { th: 'หมดเวลาแล้ว', en: "Time's up (ไทม์ส อัพ)", ch: "时间到了 (shíjiān dào le / สือเจียน เต้า เลอ)" },
+                        ]
+                    },
+                    page2: {
+                        title: 'สถานการณ์ตัวอย่าง',
+                        type: 'scenario',
+                        data: {
+                            context: 'ครูสอนจบหัวข้อที่ค่อนข้างซับซ้อน',
+                            dialogue: [
+                                 { speaker: 'ครู', th: "...และนั่นคือเหตุผลทั้งหมดค่ะ ที่ครูอธิบายไปพอจะเข้าใจไหมคะ ทุกคนตามทันใช่ไหม", en: "...and that's the entire reason. Does that make sense? Is everyone on the same page? (...แอนด์ แดทส์ ดิ เอนไทร์ รีซัน. ดาส แดท เมค เซนส์? อีส เอฟรีวัน ออน เดอะ เซม เพจ?)", ch: "...这就是全部的原因。这样说有道理吗?大家都跟上了吗? (...Zhè jiùshì quánbù de yuányīn. Zhèyàng shuō yǒu dàolǐ ma? Dàjiā dōu gēn shàngle ma? / ...เจ้อ จิ้ว ซื่อ ฉวนปู้ เตอะ หยวนอิน. เจ้อย่าง ชัว โหย่ว เต้าหลี่ มะ? ต้าเจีย โตว เกิน ช่างเลอ มะ?)" },
+                                 { speaker: 'นักเรียน', th: 'เข้าใจค่ะ/ครับ' },
+                                 { speaker: 'ครู', th: "ดีมากค่ะ ก่อนที่เราจะไปต่อ เรามาทบทวนประเด็นสำคัญกันก่อนนะคะ", en: "Great. Before we move on, let's review the main points. (เกรท. บีฟอร์ วี มูฟ ออน, เลทส์ รีวิว เดอะ เมน พอยท์ส.)", ch: "很好。在我们继续之前, 我们来复习一下要点。(Hěn hǎo. Zài wǒmen jìxù zhīqián, wǒmen lái fùxí yīxià yàodiǎn. / เหิ่นห่าว. ไจ้ หว่อเมิน จี้ชวี่ จือเฉียน, หว่อเมิน ไหล ฟู่สี อี๋เซี่ย เย่าเตี่ยน.)" },
+                            ]
+                        }
+                    },
+                    page3: {
+                        title: 'แบบฝึกหัด',
+                        type: 'quiz',
+                        data: [
+                           { q: "หลังจากอธิบายเรื่องที่ซับซ้อนไปแล้ว วิธีตรวจสอบความเข้าใจที่ดีคือการถามว่าอย่างไร", a: ["Are you okay? (อาร์ ยู โอเค)", "Any questions? (เอ็น-นี่ เควส-ชั่นส์)", "Does that make sense? (ดาส แดท เมค เซนส์)", "May I go to the toilet? (เมย์ ไอ โก ทู เดอะ ทอย-เล็ท)"], correct: 2 },
+                           { q: "เมื่อหมดเวลาทำกิจกรรมในห้องเรียน ครูควรพูดว่าอย่างไร", a: ["Time's up (ไทม์ส อัพ)", "Any questions? (เอ็น-นี่ เควส-ชั่นส์)", "Let's review the main points (เลทส์ รีวิว เดอะ เมน พอยท์ส)", "Are you okay? (อาร์ ยู โอเค)"], correct: 0 },
+                           { q: 'ประโยค "我们来复习一下要点 (wǒmen lái fùxí yīxià yàodiǎn / หว่อเมิน ไหล ฟูสี อี๋เชี่ย เย่าเตี่ยน)" หมายความว่าอย่างไร', a: ["ทุกคนตามทันใช่ไหม", "มีคำถามไหม", "เรามาทบทวนประเด็นสำคัญกัน", "ที่อธิบายไปพอเข้าใจไหม"], correct: 2 },
+                           { q: "ถ้านักเรียนฟังครูพูดไม่ทัน ควรขอให้ครูพูดซ้ำว่าอย่างไร", a: ["Does that make sense? (ดาส แดท เมค เซนส์)", "Is everyone on the same page? (อีส เอฟรีวัน ออน เดอะ เซม เพจ)", "Could you say that again, please? (คูด ยู เซย์ แดท อะเกน, พลีส)", "Any questions? (เอ็น-นี่ เควส-ชั่นส์)"], correct: 2 },
+                           { q: "หลังจากสอนจบ ครูต้องการเปิดโอกาสให้นักเรียนถามข้อสงสัย ควรพูดว่าอย่างไร", a: ["Are you okay? (อาร์ ยู โอเค)", "Any questions? (เอ็น-นี่ เควส-ชั่นส์)", "Do you understand? (ดู ยู อัน-เดอร์-สแตนด์)", "Does that make sense? (ดาส แดท เมค เซนส์)"], correct: 1 },
+                        ]
+                    }
+                }
+            },
+        ];
+        
+        let modules = JSON.parse(JSON.stringify(initialModulesState));
+
+
+        // --- ELEMENTS ---
+        const mainContent = document.getElementById('main-content');
+        const statsPage = document.getElementById('statistics-page');
+        const showStatsBtn = document.getElementById('show-stats-btn');
+        const backToHomeBtn = document.getElementById('back-to-home-btn');
+        const statsContainer = document.getElementById('stats-container');
+        const statsLoading = document.getElementById('stats-loading');
+
+        const modulesContainer = document.getElementById('modules-container');
+        const totalScoreEl = document.getElementById('total-score');
+        const completeCourseBtn = document.getElementById('complete-course-btn');
+        
+        // Module Modal Elements
+        const modal = document.getElementById('module-modal');
+        const modalContentBox = document.getElementById('modal-content-box');
+        const modalImage = document.getElementById('modal-image');
+        const modalTitle = document.getElementById('modal-title');
+        const page1El = document.getElementById('page-1');
+        const page2El = document.getElementById('page-2');
+        const page3El = document.getElementById('page-3');
+        const navBtnHome = document.getElementById('nav-btn-home');
+        const navBtnPrev = document.getElementById('nav-btn-prev');
+        const navBtnNext = document.getElementById('nav-btn-next');
+        const completeModuleBtn = document.getElementById('complete-module-btn');
+
+        // Certificate Modal Elements
+        const certModal = document.getElementById('certificate-modal');
+        const closeCertModalBtn = document.getElementById('close-cert-modal-btn');
+        const getCertBtn = document.getElementById('get-certificate-btn');
+        const firstNameInput = document.getElementById('first-name');
+        const lastNameInput = document.getElementById('last-name');
+        const gSheetFeedback = document.getElementById('g-sheet-feedback');
+        
+        let totalScore = 0;
+        let currentModuleId = null;
+        let quizAttempts = {};
+        let currentPage = 1;
+        let statsInterval = null;
+
+        // --- MAIN FUNCTIONS ---
+        function renderModules() {
+            modulesContainer.innerHTML = ''; 
+            modules.forEach((module) => {
+                const button = document.createElement('button');
+                button.className = 'module-button w-full p-4 bg-white rounded-xl shadow-md flex items-center space-x-4 border-2 border-transparent';
+                button.dataset.id = module.id;
+                if (module.locked) button.classList.add('locked');
+                if (module.completed) button.classList.add('completed');
+
+                let statusIcon = module.locked 
+                    ? `<svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clip-rule="evenodd"></path></svg>`
+                    : module.completed 
+                    ? `<svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>`
+                    : `<svg class="w-6 h-6 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path></svg>`;
+
+                button.innerHTML = `
+                    <div class="emoji-icon text-3xl p-3 bg-emerald-100 rounded-lg">${module.emoji}</div>
+                    <div class="flex-grow text-left">
+                        <p class="font-semibold text-lg">Module ${module.id}: ${module.title}</p>
+                        <p class="text-sm text-gray-500">คะแนน: ${module.score}</p>
+                    </div>
+                    <div class="status-icon">${statusIcon}</div>`;
+                
+                modulesContainer.appendChild(button);
+                button.addEventListener('click', () => { if (!module.locked) openModal(module); });
+            });
+        }
+
+        // --- MODULE MODAL FUNCTIONS ---
+        function openModal(module) {
+            currentModuleId = module.id;
+            modalImage.src = module.imageUrl;
+            modalTitle.textContent = `Module ${module.id}: ${module.title}`;
+            
+            if (!module.completed) {
+                quizAttempts[module.id] = { answers: Array(module.content.page3.data.length).fill(null), completed: false };
+            }
+
+            renderPageContent(module);
+            goToPage(1);
+
+            modal.classList.remove('invisible', 'opacity-0');
+            modalContentBox.classList.remove('scale-95');
+        }
+
+        function closeModal() {
+            modalContentBox.classList.add('scale-95');
+            modal.classList.add('opacity-0');
+            // Clear page content to stop any potential media playback like soundcloud
+            page1El.innerHTML = '';
+            setTimeout(() => modal.classList.add('invisible'), 300);
+        }
+        
+        function navigatePage(direction) {
+            currentPage += direction;
+            updatePageView();
+        }
+
+        function goToPage(pageNumber) {
+            currentPage = pageNumber;
+            updatePageView();
+        }
+
+        function updatePageView() {
+            [page1El, page2El, page3El].forEach((p, i) => p.classList.toggle('active', i + 1 === currentPage));
+            
+            navBtnPrev.disabled = currentPage === 1;
+            navBtnNext.disabled = currentPage === 3;
+            navBtnHome.style.display = 'block';
+
+            navBtnPrev.style.display = (currentPage === 1) ? 'none' : 'inline-flex';
+            navBtnNext.style.display = (currentPage === 3) ? 'none' : 'inline-flex';
+            
+            const module = modules.find(m => m.id === currentModuleId);
+            const showCompleteBtn = currentPage === 3 && !module.completed;
+            completeModuleBtn.style.display = showCompleteBtn ? 'block' : 'none';
+        }
+
+        function renderPageContent(module) {
+            // Page 1: Content + Soundcloud
+            let page1HTML = '';
+            if (module.soundcloudIframe) {
+                page1HTML += `<div class="mb-6">${module.soundcloudIframe}</div>`;
+            }
+            page1HTML += `<div class="space-y-3">${module.content.page1.data.map(p => `
+                <div class="p-3 bg-gray-50 rounded-md">
+                    <p class="font-medium text-gray-800">“${p.th}”</p>
+                    <p class="text-sm text-blue-600 ml-4">🇬🇧 ${p.en}</p>
+                    <p class="text-sm text-red-600 ml-4">🇨🇳 ${p.ch}</p>
+                </div>`).join('')}</div>`;
+            page1El.innerHTML = page1HTML;
+
+
+            // Page 2: Scenario
+            const scenario = module.content.page2.data;
+            page2El.innerHTML = `
+                <div class="p-4 bg-emerald-50 rounded-lg border-l-4 border-emerald-400">
+                    <p class="font-semibold mb-2">สถานการณ์:</p>
+                    <p>${scenario.context}</p>
+                </div>
+                <div class="mt-4 space-y-3">${scenario.dialogue.map(d => `
+                    <div class="p-3 bg-gray-50 rounded-md">
+                        <p class="font-semibold text-emerald-700">${d.speaker}:</p>
+                        ${d.th ? `<p class="ml-4 text-gray-600">🇹🇭 ${d.th}</p>` : ''}
+                        ${d.en ? `<p class="ml-4 text-blue-600">🇬🇧 ${d.en}</p>` : ''}
+                        ${d.ch ? `<p class="ml-4 text-red-600">🇨🇳 ${d.ch}</p>` : ''}
+                    </div>`).join('')}</div>`;
+
+            // Page 3: Quiz
+            renderQuizPage(module);
+        }
+
+        function renderQuizPage(module, reset = false) {
+             if (reset || !quizAttempts[module.id]) {
+                quizAttempts[module.id] = { answers: Array(module.content.page3.data.length).fill(null), completed: false };
+             }
+            
+            let quizHTML = `<div id="quiz-container" class="space-y-4">`;
+            module.content.page3.data.forEach((q, index) => {
+                quizHTML += `
+                    <div>
+                        <p class="font-medium mb-2">${index + 1}. ${q.q}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            ${q.a.map((opt, optIndex) => `
+                                <button class="quiz-option p-2 border rounded-md text-left" 
+                                        onclick="selectAnswer(${module.id}, ${index}, ${optIndex}, ${q.correct})">
+                                    ${opt}
+                                </button>`).join('')}
+                        </div>
+                        <div id="feedback-${module.id}-${index}" class="text-sm mt-1"></div>
+                    </div>`;
+            });
+            quizHTML += `</div><div id="quiz-result-${module.id}" class="mt-4 text-center font-semibold"></div>`;
+            page3El.innerHTML = quizHTML;
+            completeModuleBtn.disabled = true;
+        }
+
+        window.selectAnswer = function(moduleId, questionIndex, selectedIndex, correctIndex) {
+            const attempt = quizAttempts[moduleId];
+            if (!attempt || attempt.answers[questionIndex] !== null) return;
+
+            attempt.answers[questionIndex] = { selected: selectedIndex, correct: correctIndex };
+            
+            const options = page3El.querySelectorAll(`#quiz-container > div:nth-child(${questionIndex + 1}) .quiz-option`);
+            const feedbackEl = document.getElementById(`feedback-${moduleId}-${questionIndex}`);
+
+            options.forEach(btn => btn.classList.add('disabled'));
+            
+            const selectedBtn = options[selectedIndex];
+            
+            if (selectedIndex === correctIndex) {
+                selectedBtn.classList.add('correct');
+                feedbackEl.innerHTML = `<span class="text-green-600">🎉 ยินดีด้วย! คุณตอบถูก</span>`;
+            } else {
+                selectedBtn.classList.add('incorrect');
+                feedbackEl.innerHTML = `<span class="text-red-600">เสียใจด้วย! คำตอบที่ถูกต้องคือ "${options[correctIndex].textContent.trim()}"</span>`;
+            }
+
+            if (attempt.answers.every(ans => ans !== null)) {
+                attempt.completed = true;
+                checkQuizResult(moduleId);
+            }
+        }
+        
+        function checkQuizResult(moduleId) {
+            const attempt = quizAttempts[moduleId];
+            const resultEl = document.getElementById(`quiz-result-${moduleId}`);
+            const allCorrect = attempt.answers.every(a => a.selected === a.correct);
+
+            if (allCorrect) {
+                resultEl.innerHTML = `<p class="text-green-600 text-lg">ยอดเยี่ยม! คุณตอบถูกทุกข้อ</p>`;
+                completeModuleBtn.disabled = false;
+            } else {
+                resultEl.innerHTML = `<p class="text-red-600 text-lg">พยายามอีกครั้ง! คุณตอบผิดบางข้อ</p>
+                <button id="retry-quiz-btn-${moduleId}" class="mt-2 px-4 py-2 bg-yellow-400 text-yellow-900 rounded-lg hover:bg-yellow-500">เริ่มทำแบบทดสอบใหม่</button>`;
+                document.getElementById(`retry-quiz-btn-${moduleId}`).onclick = () => {
+                     const module = modules.find(m => m.id === moduleId);
+                     renderQuizPage(module, true);
+                };
+            }
+        }
+
+        function completeCurrentModule() {
+            const moduleIndex = modules.findIndex(m => m.id === currentModuleId);
+            if (moduleIndex !== -1 && !modules[moduleIndex].completed) {
+                modules[moduleIndex].completed = true;
+                totalScore += modules[moduleIndex].score;
+                totalScoreEl.textContent = totalScore;
+                if (moduleIndex + 1 < modules.length) {
+                    modules[moduleIndex + 1].locked = false;
+                }
+            }
+            renderModules();
+            closeModal();
+            if (modules.every(m => m.completed)) {
+                completeCourseBtn.classList.remove('hidden');
+            }
+        }
+        
+        function resetCourse() {
+            totalScore = 0;
+            totalScoreEl.textContent = '0';
+            
+            modules = JSON.parse(JSON.stringify(initialModulesState));
+
+            quizAttempts = {};
+
+            completeCourseBtn.classList.add('hidden');
+            
+            firstNameInput.value = '';
+            lastNameInput.value = '';
+            firstNameInput.disabled = false;
+            lastNameInput.disabled = false;
+            gSheetFeedback.innerHTML = '';
+            validateCertForm(); 
+
+            renderModules();
+        }
+
+        // --- CERTIFICATE MODAL FUNCTIONS ---
+        function openCertModal() {
+            certModal.classList.remove('invisible', 'opacity-0');
+            certModal.querySelector('#certificate-modal-box').classList.remove('scale-95');
+        }
+
+        function closeCertModal() {
+            certModal.querySelector('#certificate-modal-box').classList.add('scale-95');
+            certModal.classList.add('opacity-0');
+            setTimeout(() => certModal.classList.add('invisible'), 300);
+        }
+
+        function validateCertForm() {
+            const firstName = firstNameInput.value.trim();
+            const lastName = lastNameInput.value.trim();
+            getCertBtn.disabled = !(firstName && lastName);
+        }
+
+        async function submitToGoogleSheet(e) {
+            e.preventDefault();
+            gSheetFeedback.textContent = 'กำลังส่งข้อมูล...';
+            getCertBtn.disabled = true;
+
+            const data = {
+                firstName: firstNameInput.value.trim(),
+                lastName: lastNameInput.value.trim(),
+            };
+
+            try {
+                 await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                gSheetFeedback.innerHTML = `<span class="text-green-600">ส่งข้อมูลสำเร็จ! ระบบจะรีเซ็ตใน 3 วินาที...</span>`;
+                firstNameInput.disabled = true;
+                lastNameInput.disabled = true;
+                
+                setTimeout(() => {
+                    closeCertModal();
+                    resetCourse();
+                }, 3000);
+
+            } catch (error) {
+                gSheetFeedback.innerHTML = `<span class="text-red-600">เกิดข้อผิดพลาด: ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง</span>`;
+                getCertBtn.disabled = false;
+                console.error('Error submitting to Google Sheet:', error);
+            }
+        }
+        
+        // --- STATISTICS PAGE FUNCTIONS ---
+        function showStatsPage() {
+            mainContent.classList.add('opacity-0');
+            statsPage.classList.remove('invisible', 'opacity-0');
+            
+            fetchStatsData(); // Initial fetch
+            if (statsInterval) clearInterval(statsInterval);
+            statsInterval = setInterval(fetchStatsData, 60000); // Refresh every 1 minute
+        }
+
+        function hideStatsPage() {
+            statsPage.classList.add('opacity-0');
+            setTimeout(() => statsPage.classList.add('invisible'), 300);
+            mainContent.classList.remove('opacity-0');
+            
+            if (statsInterval) clearInterval(statsInterval);
+            statsInterval = null;
+        }
+
+        async function fetchStatsData() {
+            try {
+                statsLoading.style.display = 'block';
+                const response = await fetch(SCRIPT_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                if (data && data.result === 'error') {
+                    console.error("Error from Google Apps Script:", data.error);
+                    if (data.error && data.error.includes('openById')) {
+                        throw new Error("Server Error: Spreadsheet ID might be incorrect.");
+                    }
+                    throw new Error("Unknown error from server.");
+                }
+                
+                if (Array.isArray(data)) {
+                    renderStats(data);
+                } else {
+                    console.error("Data received from Google Sheet is not an array:", data);
+                    throw new Error("Invalid data format from server.");
+                }
+
+            } catch (error) {
+                console.error("Could not fetch stats:", error);
+                 if (error.message.includes("Spreadsheet ID")) {
+                    statsContainer.innerHTML = `<p class="text-yellow-300 text-center text-lg p-4"><b>เกิดข้อผิดพลาดในการเชื่อมต่อ</b><br><span class="text-sm">ไม่สามารถเปิด Google Sheet ได้ กรุณาตรวจสอบว่าคุณได้ใส่ Spreadsheet ID ที่ถูกต้องในไฟล์ Code.gs และทำการ Deploy ใหม่อีกครั้ง</span></p>`;
+                } else {
+                    statsContainer.innerHTML = `<p class="text-white/80 text-center">ไม่สามารถโหลดข้อมูลสถิติได้</p>`;
+                }
+            } finally {
+                statsLoading.style.display = 'none';
+            }
+        }
+        
+        function renderStats(data) {
+            statsContainer.innerHTML = '';
+            if (data.length === 0) {
+                 statsContainer.innerHTML = `<p class="text-white/80 text-center">ยังไม่มีผู้ผ่านการอบรม</p>`;
+                 return;
+            }
+            data.forEach((entry, index) => {
+                const date = new Date(entry.timestamp);
+                const formattedDate = date.toLocaleString('th-TH', {
+                    year: 'numeric', month: 'long', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                });
+
+                const card = document.createElement('div');
+                card.className = 'stats-card bg-white/20 backdrop-blur-md p-4 rounded-xl flex items-center space-x-4 shadow-lg';
+                card.style.opacity = '0'; // For animation
+                card.style.animationDelay = `${index * 100}ms`;
+
+                card.innerHTML = `
+                    <div class="flex-shrink-0 w-12 h-12 bg-white/30 rounded-full flex items-center justify-center text-xl font-bold text-white">${index + 1}</div>
+                    <div class="flex-grow">
+                        <p class="font-bold text-white text-lg">${entry.firstName} ${entry.lastName}</p>
+                        <p class="text-xs text-white/80">สำเร็จการอบรมเมื่อ: ${formattedDate} น.</p>
+                    </div>
+                `;
+                statsContainer.appendChild(card);
+            });
+        }
+
+
+        // --- EVENT LISTENERS ---
+        // Module Modal
+        navBtnHome.addEventListener('click', closeModal);
+        navBtnPrev.addEventListener('click', () => navigatePage(-1));
+        navBtnNext.addEventListener('click', () => navigatePage(1));
+        completeModuleBtn.addEventListener('click', completeCurrentModule);
+        
+        // Main page
+        completeCourseBtn.addEventListener('click', openCertModal);
+        showStatsBtn.addEventListener('click', showStatsPage);
+
+        // Stats Page
+        backToHomeBtn.addEventListener('click', hideStatsPage);
+
+        // Certificate Modal
+        closeCertModalBtn.addEventListener('click', closeCertModal);
+        firstNameInput.addEventListener('input', validateCertForm);
+        lastNameInput.addEventListener('input', validateCertForm);
+        getCertBtn.addEventListener('click', submitToGoogleSheet);
+        
+        // --- INITIALIZATION ---
+        renderModules();
+    });
+    </script>
+</body>
+</html>
+
