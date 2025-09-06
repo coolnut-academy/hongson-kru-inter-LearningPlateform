@@ -11,52 +11,303 @@
     <style>
         body {
             font-family: 'Kanit', sans-serif;
-            background-color: #f0fdf4;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+            min-height: 100vh;
         }
+        
+        /* ปรับปรุงการออกแบบ Glassmorphism */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.85);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
         .neon-text {
-            text-shadow: 0 0 5px #a7f3d0, 0 0 10px #a7f3d0, 0 0 15px #34d399, 0 0 20px #34d399;
+            text-shadow: 0 0 10px #34d399, 0 0 20px #10b981, 0 0 30px #065f46;
+            animation: glow 2s ease-in-out infinite alternate;
         }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #34d399, 0 0 20px #10b981, 0 0 30px #065f46; }
+            to { text-shadow: 0 0 20px #34d399, 0 0 30px #10b981, 0 0 40px #065f46; }
+        }
+        
         .title-gradient {
-            background: -webkit-linear-gradient(45deg, #047857, #2dd4bf);
+            background: linear-gradient(45deg, #047857, #059669, #10b981, #2dd4bf);
+            background-size: 400% 400%;
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease-in-out infinite;
         }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .rainbow-text {
+            background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+        
+        /* ปรับปรุงปุ่มโมดูล */
         .module-button {
-            transition: all 0.3s ease-in-out;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
+        
+        .module-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s ease-in-out;
+        }
+        
+        .module-button:hover::before {
+            left: 100%;
+        }
+        
         .module-button.locked {
-            background-color: #e5e7eb;
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
             cursor: not-allowed;
             color: #9ca3af;
         }
-         .module-button.locked .emoji-icon {
+        
+        .module-button.locked .emoji-icon {
             filter: grayscale(100%);
         }
+        
         .module-button.completed {
-            background-color: #d1fae5;
-            border-color: #10b981;
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            border: 2px solid #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
         }
+        
         .module-button:not(.locked):hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15), 0 5px 15px rgba(16, 185, 129, 0.2);
         }
         .quiz-option {
-            transition: background-color 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
+        
+        .quiz-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.3s ease-in-out;
+        }
+        
+        .quiz-option:hover::before {
+            left: 100%;
+        }
+        
         .quiz-option.correct {
-            background-color: #d1fae5 !important;
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0) !important;
             border-color: #10b981 !important;
             color: #065f46;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
         }
+        
         .quiz-option.incorrect {
-            background-color: #fee2e2 !important;
+            background: linear-gradient(135deg, #fee2e2, #fecaca) !important;
             border-color: #ef4444 !important;
             color: #991b1b;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
         }
         .quiz-option.disabled {
             cursor: not-allowed;
             opacity: 0.8;
+        }
+        
+        /* เพิ่มอนิเมชั่นให้กับการ์ด */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        
+        .animate-slide-in-left {
+            animation: slideInFromLeft 0.8s ease-out forwards;
+        }
+        
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* เพิ่มพื้นหลังแบบ pattern */
+        .bg-pattern {
+            background-image: url('https://www.transparenttextures.com/patterns/leafy-green.png');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        /* Progress Bar Styles */
+        .progress-bar {
+            width: 0%;
+        }
+        
+        /* Dark Mode Styles */
+        .dark {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 50%, #0f172a 100%);
+        }
+        
+        .dark .glass-effect {
+            background: rgba(31, 41, 55, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .dark .module-button {
+            background: rgba(55, 65, 81, 0.8);
+            color: #f3f4f6;
+        }
+        
+        .dark .module-button:not(.locked):hover {
+            background: rgba(75, 85, 99, 0.9);
+        }
+        
+        .dark .text-gray-600 {
+            color: #d1d5db !important;
+        }
+        
+        .dark .text-gray-800 {
+            color: #f3f4f6 !important;
+        }
+        
+        .dark .bg-gray-50 {
+            background-color: #374151 !important;
+        }
+        
+        .dark .quiz-option {
+            background: rgba(55, 65, 81, 0.8);
+            color: #f3f4f6;
+            border: 1px solid #4b5563;
+        }
+        
+        .dark .quiz-option:hover {
+            background: rgba(75, 85, 99, 0.9);
+        }
+        
+        /* Mobile Responsive Improvements */
+        @media (max-width: 768px) {
+            header img {
+                height: 4rem; /* 64px */
+            }
+            
+            .rainbow-text {
+                font-size: 1.5rem; /* 24px */
+            }
+            
+            header .flex {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .module-button {
+                padding: 1rem;
+            }
+            
+            .module-button .emoji-icon {
+                font-size: 1.5rem;
+                padding: 0.5rem;
+            }
+            
+            .module-button .font-semibold {
+                font-size: 1rem;
+            }
+            
+            #modal-content-box {
+                margin: 1rem;
+                max-height: 85vh;
+            }
+            
+            .glass-effect {
+                padding: 1rem;
+            }
+            
+            #score-container {
+                padding: 0.75rem;
+            }
+            
+            #score-container .text-lg {
+                font-size: 1rem;
+            }
+            
+            #score-container .text-3xl {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            header img {
+                height: 3rem; /* 48px */
+            }
+            
+            .rainbow-text {
+                font-size: 1.25rem; /* 20px */
+            }
+            
+            .module-button {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            
+            .module-button .flex-grow {
+                text-align: center;
+            }
+            
+            .quiz-option {
+                padding: 0.75rem;
+                font-size: 0.875rem;
+            }
         }
         #modal-body::-webkit-scrollbar, #certificate-modal-body::-webkit-scrollbar, #stats-container::-webkit-scrollbar { width: 8px; }
         #modal-body::-webkit-scrollbar-track, #certificate-modal-body::-webkit-scrollbar-track, #stats-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
@@ -93,22 +344,40 @@
 </head>
 <body class="bg-green-50 text-gray-800">
     <!-- Main Learning Content -->
-    <div id="main-content" class="main-content min-h-screen w-full flex flex-col items-center p-4 relative bg-cover bg-center" style="background-image: url('https://www.transparenttextures.com/patterns/leafy-green.png');">
+    <div id="main-content" class="main-content min-h-screen w-full flex flex-col items-center p-4 relative bg-pattern">
         <div class="absolute inset-0 bg-emerald-50/80"></div>
         <header class="relative z-10 w-full max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center p-4 mb-6 md:mb-8 gap-4">
-             <div class="text-center md:text-left flex items-center justify-center md:justify-start">
-                <img src="https://img2.pic.in.th/pic/logo-hongson.png" alt="Logo" class="w-16 h-16 mr-4">
-                <h1 class="text-4xl md:text-5xl font-bold title-gradient drop-shadow-md">Hongson Kru Inter</h1>
+             <div class="text-center md:text-left flex items-center justify-center md:justify-start gap-4">
+                <img src="https://img2.pic.in.th/pic/HONGSON-KRU-INTER.png" alt="Hongson Kru Inter Logo" class="h-20 md:h-24 object-contain">
+                <h1 class="text-4xl md:text-6xl font-bold rainbow-text drop-shadow-lg">HONGSON KRU INTER</h1>
             </div>
-            <div id="score-container" class="bg-white/80 backdrop-blur-sm border-2 border-emerald-400 rounded-xl shadow-lg p-3 text-center flex-shrink-0">
-                <span class="text-lg font-semibold text-emerald-700">คะแนนรวม</span>
-                <p id="total-score" class="text-3xl font-bold text-emerald-500 neon-text">0</p>
+            <div class="flex items-center gap-4">
+                <!-- Dark Mode Toggle -->
+                <button id="theme-toggle" class="nav-button p-2 glass-effect rounded-full shadow-lg" title="เปลี่ยนธีม">
+                    <svg id="theme-toggle-light-icon" class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                </button>
+                
+                <div id="score-container" class="glass-effect border-2 border-emerald-400 rounded-xl shadow-lg p-3 text-center flex-shrink-0 animate-pulse">
+                    <span class="text-lg font-semibold text-emerald-700">คะแนนรวม</span>
+                    <p id="total-score" class="text-3xl font-bold text-emerald-500 neon-text">0</p>
+                </div>
             </div>
         </header>
         <main id="learning-path" class="relative z-10 w-full max-w-2xl flex-grow flex flex-col items-center pb-8">
-            <div class="w-full bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-md mb-8 text-center">
+            <div class="w-full glass-effect p-4 rounded-xl shadow-md mb-8 text-center animate-fade-in-up">
                 <h2 class="text-xl font-semibold text-emerald-700 mb-2">ยินดีต้อนรับ!</h2>
-                <p class="text-gray-600 text-sm">หลักสูตร "ภาษาอังกฤษและภาษาจีนในชีวิตประจำวันสำหรับครู" พร้อมแล้ว! มาเริ่มเรียนรู้และฝึกฝนประโยคสำคัญที่ใช้บ่อยในโรงเรียนกันเถอะ</p>
+                <p class="text-gray-600 text-sm mb-4">หลักสูตร "ภาษาอังกฤษและภาษาจีนในชีวิตประจำวันสำหรับครู" พร้อมแล้ว! มาเริ่มเรียนรู้และฝึกฝนประโยคสำคัญที่ใช้บ่อยในโรงเรียนกันเถอะ</p>
+                
+                <!-- Progress Bar -->
+                <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
+                    <div id="progress-bar" class="bg-gradient-to-r from-emerald-500 to-teal-500 h-3 rounded-full transition-all duration-500 ease-out progress-bar"></div>
+                </div>
+                <p id="progress-text" class="text-sm text-gray-600">ความคืบหน้า: 0/5 โมดูล (0%)</p>
             </div>
             <div id="modules-container" class="w-full space-y-4"></div>
             
@@ -117,6 +386,11 @@
             </button>
             <button id="show-stats-btn" class="mt-4 nav-button px-6 py-2 bg-white border-2 border-emerald-300 text-emerald-700 font-semibold rounded-lg shadow-sm">
                 📊 สถิติผู้ผ่านการอบรม
+            </button>
+            
+            <!-- ปุ่มแสดงความพึงพอใจ -->
+            <button id="satisfaction-btn" class="mt-4 nav-button px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                ⭐ ประเมินความพึงพอใจ ⭐
             </button>
         </main>
         <footer class="relative z-10 w-full max-w-6xl mx-auto text-center text-xs text-gray-600 mt-auto p-4">
@@ -203,7 +477,7 @@
             { 
                 id: 1, title: 'การทักทาย ถามไถ่ และอำลา', score: 20, emoji: '👋', 
                 imageUrl: 'https://placehold.co/600x300/d1fae5/065f46?text=Module+1',
-                soundcloudIframe: `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2159606790&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/satit-siriwach" title="Satit Siriwach" target="_blank" style="color: #cccccc; text-decoration: none;">Satit Siriwach</a> · <a href="https://soundcloud.com/satit-siriwach/1a" title="โมดูลที่ 1 - การทักทาย ถามไถ่ และอำลา" target="_blank" style="color: #cccccc; text-decoration: none;">โมดูลที่ 1 - การทักทาย ถามไถ่ และอำลา</a></div>`,
+                soundcloudIframe: `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2165793000&color=ff5500"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/satit-siriwach" title="Satit Siriwach" target="_blank" style="color: #cccccc; text-decoration: none;">Satit Siriwach</a> · <a href="https://soundcloud.com/satit-siriwach/modul-1" title="Modul 1 : การทักทาย ถามไถ่ และอำลา" target="_blank" style="color: #cccccc; text-decoration: none;">Modul 1 : การทักทาย ถามไถ่ และอำลา</a></div>`,
                 completed: false, locked: false,
                 content: {
                     page1: {
@@ -247,7 +521,7 @@
             { 
                 id: 2, title: 'การแนะนำตนเอง', score: 20, emoji: '🤝', 
                 imageUrl: 'https://placehold.co/600x300/a7f3d0/065f46?text=Module+2', 
-                soundcloudIframe: `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/satit-siriwach/2a&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/satit-siriwach" title="Satit Siriwach" target="_blank" style="color: #cccccc; text-decoration: none;">Satit Siriwach</a> · <a href="https://soundcloud.com/satit-siriwach/2a" title="โมดูลที่ 2 - การแนะนำตนเอง" target="_blank" style="color: #cccccc; text-decoration: none;">โมดูลที่ 2 - การแนะนำตนเอง</a></div>`,
+                soundcloudIframe: `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2165793819&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/satit-siriwach" title="Satit Siriwach" target="_blank" style="color: #cccccc; text-decoration: none;">Satit Siriwach</a> · <a href="https://soundcloud.com/satit-siriwach/module-2" title="Module 2 : การแนะนำตนเอง" target="_blank" style="color: #cccccc; text-decoration: none;">Module 2 : การแนะนำตนเอง</a></div>`,
                 completed: false, locked: true,
                 content: {
                     page1: {
@@ -288,7 +562,7 @@
             {
                 id: 3, title: 'ประโยคคำสั่งในห้องเรียน', score: 20, emoji: '🧑‍🏫', 
                 imageUrl: 'https://placehold.co/600x300/6ee7b7/065f46?text=Module+3', 
-                soundcloudIframe: `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/satit-siriwach/3a&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/satit-siriwach" title="Satit Siriwach" target="_blank" style="color: #cccccc; text-decoration: none;">Satit Siriwach</a> · <a href="https://soundcloud.com/satit-siriwach/3a" title="โมดูลที่ 3 - ประโยคคำสั่งในห้องเรียน" target="_blank" style="color: #cccccc; text-decoration: none;">โมดูลที่ 3 - ประโยคคำสั่งในห้องเรียน</a></div>`,
+                soundcloudIframe: `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2165795265&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/satit-siriwach" title="Satit Siriwach" target="_blank" style="color: #cccccc; text-decoration: none;">Satit Siriwach</a> · <a href="https://soundcloud.com/satit-siriwach/module-3" title="Module 3 : ประโยคคำสั่งในห้องเรียน" target="_blank" style="color: #cccccc; text-decoration: none;">Module 3 : ประโยคคำสั่งในห้องเรียน</a></div>`,
                 completed: false, locked: true,
                 content: {
                     page1: {
@@ -329,7 +603,7 @@
             { 
                 id: 4, title: 'การให้กำลังใจและคำชม', score: 20, emoji: '✨', 
                 imageUrl: 'https://placehold.co/600x300/34d399/065f46?text=Module+4', 
-                soundcloudIframe: `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/satit-siriwach/4a&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/satit-siriwach" title="Satit Siriwach" target="_blank" style="color: #cccccc; text-decoration: none;">Satit Siriwach</a> · <a href="https://soundcloud.com/satit-siriwach/4a" title="โมดูลที่ 4 - การให้กำลังใจและคำชม" target="_blank" style="color: #cccccc; text-decoration: none;">โมดูลที่ 4 - การให้กำลังใจและคำชม</a></div>`,
+                soundcloudIframe: `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2165795688&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/satit-siriwach" title="Satit Siriwach" target="_blank" style="color: #cccccc; text-decoration: none;">Satit Siriwach</a> · <a href="https://soundcloud.com/satit-siriwach/module-4" title="Module 4: การให้กำลังใจและคำชม" target="_blank" style="color: #cccccc; text-decoration: none;">Module 4: การให้กำลังใจและคำชม</a></div>`,
                 completed: false, locked: true,
                 content: {
                     page1: {
@@ -372,7 +646,7 @@
             {
                 id: 5, title: 'การสอบถามและแจ้งข้อมูลนักเรียน', score: 20, emoji: '❓', 
                 imageUrl: 'https://placehold.co/600x300/10b981/f0fdf4?text=Module+5', 
-                soundcloudIframe: `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/satit-siriwach/5a&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/satit-siriwach" title="Satit Siriwach" target="_blank" style="color: #cccccc; text-decoration: none;">Satit Siriwach</a> · <a href="https://soundcloud.com/satit-siriwach/5a" title="โมดูลที่ 5 - การสอบถามและแจ้งข้อมูลนักเรียน" target="_blank" style="color: #cccccc; text-decoration: none;">โมดูลที่ 5 - การสอบถามและแจ้งข้อมูลนักเรียน</a></div>`,
+                soundcloudIframe: `<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2165797566&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe><div style="font-size: 10px; color: #cccccc;line-break: anywhere;word-break: normal;overflow: hidden;white-space: nowrap;text-overflow: ellipsis; font-family: Interstate,Lucida Grande,Lucida Sans Unicode,Lucida Sans,Garuda,Verdana,Tahoma,sans-serif;font-weight: 100;"><a href="https://soundcloud.com/satit-siriwach" title="Satit Siriwach" target="_blank" style="color: #cccccc; text-decoration: none;">Satit Siriwach</a> · <a href="https://soundcloud.com/satit-siriwach/module-5" title="Module 5 : การสอบถามและแจ้งข้อมูลนักเรียน" target="_blank" style="color: #cccccc; text-decoration: none;">Module 5 : การสอบถามและแจ้งข้อมูลนักเรียน</a></div>`,
                 completed: false, locked: true,
                 content: {
                      page1: {
@@ -424,10 +698,16 @@
         const backToHomeBtn = document.getElementById('back-to-home-btn');
         const statsContainer = document.getElementById('stats-container');
         const statsLoading = document.getElementById('stats-loading');
+        const satisfactionBtn = document.getElementById('satisfaction-btn');
 
         const modulesContainer = document.getElementById('modules-container');
         const totalScoreEl = document.getElementById('total-score');
         const completeCourseBtn = document.getElementById('complete-course-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
         
         // Module Modal Elements
         const modal = document.getElementById('module-modal');
@@ -455,13 +735,91 @@
         let quizAttempts = {};
         let currentPage = 1;
         let statsInterval = null;
+        let isDarkMode = localStorage.getItem('darkMode') === 'true';
+        
+        // ฟังก์ชันเสียงประกอบ
+        function playSound(type) {
+            try {
+                let frequency;
+                let duration = 200;
+                
+                switch(type) {
+                    case 'correct':
+                        frequency = 800;
+                        break;
+                    case 'incorrect':
+                        frequency = 300;
+                        break;
+                    case 'click':
+                        frequency = 600;
+                        duration = 100;
+                        break;
+                    default:
+                        return;
+                }
+                
+                // สร้างเสียงด้วย Web Audio API
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = 'square';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration / 1000);
+            } catch (e) {
+                console.log('Sound not supported:', e);
+            }
+        }
+
+        // --- DARK MODE FUNCTIONS ---
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            localStorage.setItem('darkMode', isDarkMode);
+            updateTheme();
+        }
+        
+        function updateTheme() {
+            if (isDarkMode) {
+                document.body.classList.add('dark');
+                themeToggleLightIcon.classList.add('hidden');
+                themeToggleDarkIcon.classList.remove('hidden');
+            } else {
+                document.body.classList.remove('dark');
+                themeToggleLightIcon.classList.remove('hidden');
+                themeToggleDarkIcon.classList.add('hidden');
+            }
+        }
 
         // --- MAIN FUNCTIONS ---
+        function updateProgress() {
+            const completedModules = modules.filter(m => m.completed).length;
+            const totalModules = modules.length;
+            const progressPercentage = (completedModules / totalModules) * 100;
+            
+            progressBar.style.width = progressPercentage + '%';
+            progressText.textContent = `ความคืบหน้า: ${completedModules}/${totalModules} โมดูล (${Math.round(progressPercentage)}%)`;
+            
+            // เพิ่มเอฟเฟกต์กระพริบเมื่อสำเร็จ
+            if (completedModules === totalModules) {
+                progressBar.classList.add('animate-pulse');
+                progressText.textContent += ' 🎉 สำเร็จแล้ว!';
+            }
+        }
+        
         function renderModules() {
             modulesContainer.innerHTML = ''; 
-            modules.forEach((module) => {
+            modules.forEach((module, index) => {
                 const button = document.createElement('button');
-                button.className = 'module-button w-full p-4 bg-white rounded-xl shadow-md flex items-center space-x-4 border-2 border-transparent';
+                button.className = 'module-button w-full p-4 glass-effect rounded-xl shadow-md flex items-center space-x-4 border-2 border-transparent animate-fade-in-up';
+                button.style.animationDelay = `${index * 200}ms`;
                 button.dataset.id = module.id;
                 if (module.locked) button.classList.add('locked');
                 if (module.completed) button.classList.add('completed');
@@ -481,8 +839,15 @@
                     <div class="status-icon">${statusIcon}</div>`;
                 
                 modulesContainer.appendChild(button);
-                button.addEventListener('click', () => { if (!module.locked) openModal(module); });
+                button.addEventListener('click', () => { 
+                    if (!module.locked) {
+                        playSound('click');
+                        openModal(module);
+                    }
+                });
             });
+            
+            updateProgress();
         }
 
         // --- MODULE MODAL FUNCTIONS ---
@@ -608,9 +973,11 @@
             const selectedBtn = options[selectedIndex];
             
             if (selectedIndex === correctIndex) {
+                playSound('correct');
                 selectedBtn.classList.add('correct');
                 feedbackEl.innerHTML = `<span class="text-green-600">🎉 ยินดีด้วย! คุณตอบถูก</span>`;
             } else {
+                playSound('incorrect');
                 selectedBtn.classList.add('incorrect');
                 feedbackEl.innerHTML = `<span class="text-red-600">เสียใจด้วย! คำตอบที่ถูกต้องคือ "${options[correctIndex].textContent.trim()}"</span>`;
             }
@@ -624,17 +991,25 @@
         function checkQuizResult(moduleId) {
             const attempt = quizAttempts[moduleId];
             const resultEl = document.getElementById(`quiz-result-${moduleId}`);
-            const allCorrect = attempt.answers.every(a => a.selected === a.correct);
+            const correctAnswers = attempt.answers.filter(a => a.selected === a.correct).length;
+            const totalQuestions = attempt.answers.length;
+            const percentage = (correctAnswers / totalQuestions) * 100;
 
-            if (allCorrect) {
-                resultEl.innerHTML = `<p class="text-green-600 text-lg">ยอดเยี่ยม! คุณตอบถูกทุกข้อ</p>`;
+            if (percentage === 100) {
+                resultEl.innerHTML = `<p class="text-green-600 text-lg">🎉 ยอดเยี่ยม! คุณตอบถูกทุกข้อ (${correctAnswers}/${totalQuestions}) - ผ่านแล้ว!</p>`;
                 completeModuleBtn.disabled = false;
             } else {
-                resultEl.innerHTML = `<p class="text-red-600 text-lg">พยายามอีกครั้ง! คุณตอบผิดบางข้อ</p>
-                <button id="retry-quiz-btn-${moduleId}" class="mt-2 px-4 py-2 bg-yellow-400 text-yellow-900 rounded-lg hover:bg-yellow-500">เริ่มทำแบบทดสอบใหม่</button>`;
-                document.getElementById(`retry-quiz-btn-${moduleId}`).onclick = () => {
-                     const module = modules.find(m => m.id === moduleId);
-                     renderQuizPage(module, true);
+                resultEl.innerHTML = `<p class="text-red-600 text-lg">� ต้องตอบถูกทุกข้อถึงจะผ่าน! คุณตอบถูก ${correctAnswers}/${totalQuestions} ข้อ (${percentage.toFixed(0)}%)</p>
+                <button id="retry-quiz-btn-${moduleId}" class="mt-2 px-4 py-2 bg-red-400 text-red-900 rounded-lg hover:bg-red-500">ลองใหม่อีกครั้ง</button>`;
+                completeModuleBtn.disabled = true; // ต้องได้ 100% ถึงจะผ่าน
+            }
+            
+            // เพิ่ม event listener สำหรับปุ่ม retry
+            const retryBtn = document.getElementById(`retry-quiz-btn-${moduleId}`);
+            if (retryBtn) {
+                retryBtn.onclick = () => {
+                    const module = modules.find(m => m.id === moduleId);
+                    renderQuizPage(module, true);
                 };
             }
         }
@@ -674,6 +1049,7 @@
             validateCertForm(); 
 
             renderModules();
+            updateProgress();
         }
 
         // --- CERTIFICATE MODAL FUNCTIONS ---
@@ -746,6 +1122,12 @@
             
             if (statsInterval) clearInterval(statsInterval);
             statsInterval = null;
+        }
+        
+        // ฟังก์ชันเปิดลิงค์ความพึงพอใจ
+        function openSatisfactionForm() {
+            playSound('click');
+            window.open('https://docs.google.com/forms/d/e/1FAIpQLSd1O86tY-LO-hDK3ukmehMdZi-oSxqGFCWttW3uTQVQ69f4QA/viewform', '_blank');
         }
 
         async function fetchStatsData() {
@@ -824,6 +1206,7 @@
         // Main page
         completeCourseBtn.addEventListener('click', openCertModal);
         showStatsBtn.addEventListener('click', showStatsPage);
+        satisfactionBtn.addEventListener('click', openSatisfactionForm);
 
         // Stats Page
         backToHomeBtn.addEventListener('click', hideStatsPage);
@@ -834,8 +1217,13 @@
         lastNameInput.addEventListener('input', validateCertForm);
         getCertBtn.addEventListener('click', submitToGoogleSheet);
         
+        // Dark Mode Toggle
+        themeToggle.addEventListener('click', toggleDarkMode);
+        
         // --- INITIALIZATION ---
+        updateTheme(); // ตั้งค่าธีมตามที่บันทึกไว้
         renderModules();
+        updateProgress();
     });
     </script>
 </body>
